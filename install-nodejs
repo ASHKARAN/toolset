@@ -1,0 +1,14 @@
+#!/bin/bash
+
+sudo apt-get update
+
+# Install Node.js 16
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install npm
+sudo apt-get install -y npm
+
+# Print Node.js and npm versions
+echo "Node.js version: $(node -v)"
+echo "npm version: $(npm -v)"
