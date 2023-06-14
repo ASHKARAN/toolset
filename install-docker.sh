@@ -3,20 +3,21 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-
+yes | apt update
+yes | apt upgrade
 echo  ===================== STAGE 1 [remove old docker]  =====================
-apt-get remove docker docker-engine docker.io containerd runc
+yes | apt-get remove docker docker-engine docker.io containerd runc
 
 echo  ===================== STAGE 2 [pre-install]  =====================
-apt-get install \
+yes | apt-get install \
     ca-certificates \
     curl \
     gnupg
 echo  ===================== STAGE 3  =====================
-apt-get update
+yes | apt-get update
 
 echo  ===================== STAGE 4  =====================
-apt-get install \
+yes | apt-get install \
     ca-certificates \
     curl \
     gnupg
@@ -42,7 +43,7 @@ apt-get update
 
 echo  ===================== STAGE 8  =====================
 
-chmod a+r /etc/apt/keyrings/docker.gpg
+yes | chmod a+r /etc/apt/keyrings/docker.gpg
 
 
 echo  ===================== STAGE 9  =====================
@@ -53,18 +54,19 @@ apt-get update
 
 echo  ===================== STAGE 10 [installing docker]  =====================
 
-apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+yes | apt  install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+
+yes | apt --fix-broken install
 
 echo  ===================== STAGE 11 [non-root docker]  =====================
 
 
-groupadd docker
-usermod -aG docker $USER
+usermod -aG docker $USER 
 newgrp docker
 
 
 echo  ===================== STAGE 12 [install docker compose]  =====================
-apt  install docker-compose
+yes | apt  install docker-compose
 
 
