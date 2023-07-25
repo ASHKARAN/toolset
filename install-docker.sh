@@ -62,7 +62,7 @@ yes | apt --fix-broken install
 echo  ===================== STAGE 11 [non-root docker]  =====================
 
 
-usermod -aG docker $USER 
+usermod -aG docker $USER
 newgrp docker
 
 
