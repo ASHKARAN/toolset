@@ -115,6 +115,8 @@ EOF
 show_help() {
     show_banner
     echo -e "${GREEN}USAGE:${NC}"
+    echo "  devops [options] [task_numbers...]"
+    echo "  toolset [options] [task_numbers...]"
     echo "  ./setup.sh [options] [task_numbers...]"
     echo
     echo -e "${GREEN}OPTIONS:${NC}"
@@ -122,13 +124,20 @@ show_help() {
     echo "  -v, --version     Show version"
     echo "  -l, --list        List all available tasks"
     echo "  -a, --all         Run all tasks (be careful!)"
+    echo "  -u, --update      Update toolset from GitHub"
     echo "  -i, --interactive Run in interactive mode (default)"
     echo
     echo -e "${GREEN}EXAMPLES:${NC}"
-    echo "  ./setup.sh                    # Interactive menu"
-    echo "  ./setup.sh 1 3 8              # Run tasks 1, 3, and 8"
-    echo "  ./setup.sh 1 2 3 9            # Run multiple tasks"
-    echo "  ./setup.sh --list             # Show all tasks"
+    echo "  sudo devops                   # Interactive menu"
+    echo "  sudo devops 1 3 8             # Run tasks 1, 3, and 8"
+    echo "  sudo devops 13 9 8 3 10       # Common server setup"
+    echo "  devops --list                 # Show all tasks"
+    echo "  devops --update               # Update from GitHub"
+    echo
+    echo -e "${GREEN}GLOBAL COMMANDS:${NC}"
+    echo "  After installation, these commands are available system-wide:"
+    echo "    sudo devops     - Launch DevOps Toolset"
+    echo "    sudo toolset    - Launch DevOps Toolset"
     echo
     echo -e "${GREEN}AVAILABLE TASKS:${NC}"
     list_tasks
@@ -151,7 +160,7 @@ show_menu() {
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo
     echo -e "${GREEN}Enter task numbers separated by spaces (e.g., 1 3 8)${NC}"
-    echo -e "${GREEN}Enter 'q' to quit, 'h' for help, 'a' for all tasks${NC}"
+    echo -e "${GREEN}Commands: 'q' quit | 'h' help | 'a' all tasks | 'u' update${NC}"
     echo
 }
 
@@ -241,6 +250,10 @@ interactive_mode() {
                 show_help
                 read -p "Press Enter to continue..."
                 ;;
+            u|U|update)
+                self_update
+                exit 0
+                ;;
             a|A|all)
                 print_warning "This will run ALL tasks. Are you sure?"
                 read -p "Type 'yes' to confirm: " confirm
@@ -267,6 +280,24 @@ interactive_mode() {
                 ;;
         esac
     done
+}
+
+# Self-update from GitHub
+self_update() {
+    print_info "Updating DevOps Toolset from GitHub..."
+    echo
+
+    local INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/ASHKARAN/toolset/main/install.sh"
+
+    # Download and run installer in update mode
+    if command -v curl &> /dev/null; then
+        curl -fsSL "$INSTALL_SCRIPT_URL" | SCRIPT_MODE=update INSTALL_DIR="$SCRIPT_DIR" bash
+    elif command -v wget &> /dev/null; then
+        wget -qO- "$INSTALL_SCRIPT_URL" | SCRIPT_MODE=update INSTALL_DIR="$SCRIPT_DIR" bash
+    else
+        print_error "Neither curl nor wget found. Cannot update."
+        exit 1
+    fi
 }
 
 # Check root at start
@@ -297,6 +328,11 @@ main() {
             echo -e "${GREEN}Available Tasks:${NC}"
             echo
             list_tasks
+            exit 0
+            ;;
+        -u|--update)
+            show_banner
+            self_update
             exit 0
             ;;
         -a|--all)

@@ -1,69 +1,109 @@
-# DevOps Toolset - Server Setup Helper
+# DevOps Toolset
 
-A collection of bash scripts for automating initial server setup and configuration tasks on Ubuntu/Debian systems.
+A comprehensive collection of bash scripts for automating server setup and configuration tasks on Ubuntu/Debian systems.
 
-## One-Line Installation
+## Table of Contents
 
-```bash
-# Using curl
-curl -fsSL https://raw.githubusercontent.com/ASHKARAN/toolset/main/install.sh | bash
-
-# Using wget
-wget -qO- https://raw.githubusercontent.com/ASHKARAN/toolset/main/install.sh | bash
-
-# Custom install directory
-curl -fsSL https://raw.githubusercontent.com/ASHKARAN/toolset/main/install.sh | INSTALL_DIR=/opt/toolset bash
-```
-
-After installation, run:
-```bash
-sudo ~/toolset/setup.sh
-```
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Available Tasks](#available-tasks)
+- [Task Details](#task-details)
+- [Project Structure](#project-structure)
+- [Requirements](#requirements)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
-- 🎯 **Interactive Menu**: Easy-to-use menu-driven interface
-- 🔢 **Multi-task Selection**: Run multiple tasks at once (e.g., `1 3 8`)
-- 🤖 **Auto-yes Mode**: No manual confirmations needed
-- 📦 **Modular Design**: Each task is a separate script
-- 🎨 **Colored Output**: Clear, readable status messages
+- **Interactive Menu** — Easy-to-use menu-driven interface for task selection
+- **One-Line Install** — Get started in seconds with a single command
+- **Global Commands** — Run from anywhere using `devops` or `toolset` commands
+- **Self-Update** — Keep your toolset current with `--update`
+- **Multi-task Execution** — Run multiple tasks in sequence (e.g., `1 3 8`)
+- **Modular Design** — Each task is a separate, maintainable script
+- **Safe Defaults** — Confirmation prompts for destructive operations
 
-## Quick Start
+## Installation
+
+### Quick Install (Recommended)
+
+Using curl:
+```bash
+curl -fsSL https://raw.githubusercontent.com/ASHKARAN/toolset/main/install.sh | bash
+```
+
+Using wget:
+```bash
+wget -qO- https://raw.githubusercontent.com/ASHKARAN/toolset/main/install.sh | bash
+```
+
+### Custom Install Directory
 
 ```bash
-# Clone or download the toolset
-cd /path/to/toolset
+curl -fsSL https://raw.githubusercontent.com/ASHKARAN/toolset/main/install.sh | INSTALL_DIR=/opt/toolset bash
+```
 
-# Make scripts executable
-chmod +x setup.sh
-chmod +x scripts/*.sh
+### Manual Installation
 
-# Run the setup helper (requires root)
-sudo ./setup.sh
+```bash
+git clone https://github.com/ASHKARAN/toolset.git ~/toolset
+cd ~/toolset
+chmod +x setup.sh install.sh scripts/*.sh
 ```
 
 ## Usage
 
-### Interactive Mode (default)
+### Global Commands
+
+After installation, the following commands are available system-wide:
+
+| Command | Description |
+|---------|-------------|
+| `sudo devops` | Launch the DevOps Toolset |
+| `sudo toolset` | Launch the DevOps Toolset |
+| `devops --help` | Show help and available options |
+| `devops --list` | List all available tasks |
+| `devops --update` | Update toolset from GitHub |
+
+### Interactive Mode
+
 ```bash
-sudo ./setup.sh
+sudo devops
 ```
+
+This opens an interactive menu where you can select tasks by number.
 
 ### Run Specific Tasks
-```bash
-# Run tasks 1, 3, and 8
-sudo ./setup.sh 1 3 8
 
-# Run tasks 1 through 5
-sudo ./setup.sh 1 2 3 4 5
+```bash
+# Run a single task
+sudo devops 3
+
+# Run multiple tasks
+sudo devops 1 3 8
+
+# Run a sequence of tasks
+sudo devops 13 9 8 3 10
 ```
 
-### Other Commands
+### Command Line Options
+
+| Option | Description |
+|--------|-------------|
+| `-h, --help` | Show help message |
+| `-v, --version` | Show version |
+| `-l, --list` | List all available tasks |
+| `-a, --all` | Run all tasks (use with caution) |
+| `-u, --update` | Update from GitHub |
+| `-i, --interactive` | Run in interactive mode (default) |
+
+### Updating
+
+Keep your toolset up-to-date:
+
 ```bash
-./setup.sh --help       # Show help
-./setup.sh --list       # List all tasks
-./setup.sh --version    # Show version
-sudo ./setup.sh --all   # Run all tasks (careful!)
+devops --update
 ```
 
 ## Available Tasks
@@ -76,7 +116,7 @@ sudo ./setup.sh --all   # Run all tasks (careful!)
 | 4 | Clean Docker Logs | Truncate all Docker container log files |
 | 5 | Clean Docker Full | Remove all Docker containers, images, volumes, networks |
 | 6 | Install Node.js (NVM) | Install Node.js using NVM (Node Version Manager) |
-| 7 | Install Node.js + PM2 | Install Node.js (NVM) with PM2 process manager |
+| 7 | Install Node.js + PM2 | Install Node.js with PM2 process manager |
 | 8 | Install Git | Install Git version control |
 | 9 | Install Essentials | Install essential packages (htop, curl, vim, etc.) |
 | 10 | Setup Firewall | Configure UFW firewall with basic rules |
@@ -84,63 +124,39 @@ sudo ./setup.sh --all   # Run all tasks (careful!)
 | 12 | Setup Swap | Create and configure swap space |
 | 13 | System Update | Update and upgrade all system packages |
 | 14 | Install Nginx (Docker) | Run Nginx in Docker with volume mappings |
-| 15 | Install Certbot | Install Certbot for Let's Encrypt SSL |
+| 15 | Install Certbot | Install Certbot for Let's Encrypt SSL certificates |
 
-## Directory Structure
+## Task Details
 
-```
-toolset/
-├── setup.sh                    # Main helper script
-├── README.md                   # This file
-└── scripts/
-    ├── common.sh               # Common functions and utilities
-    ├── create-user.sh          # Create user task
-    ├── copy-ssh-key.sh         # Copy SSH key task
-    ├── install-docker.sh       # Install Docker task
-    ├── clean-docker-logs.sh    # Clean Docker logs task
-    ├── clean-docker-full.sh    # Full Docker cleanup task
-    ├── install-nodejs.sh       # Install Node.js (NVM) task
-    ├── install-nodejs-pm2.sh   # Install Node.js + PM2 task
-    ├── install-git.sh          # Install Git task
-    ├── install-essentials.sh   # Install essentials task
-    ├── setup-firewall.sh       # Setup firewall task
-    ├── setup-timezone.sh       # Setup timezone task
-    ├── setup-swap.sh           # Setup swap task
-    ├── system-update.sh        # System update task
-    ├── install-nginx.sh        # Install Nginx (Docker) task
-    └── install-certbot.sh      # Install Certbot task
-```
+### Docker
 
-## Running Individual Scripts
-
-Each script can also be run independently:
+Installs Docker Engine and Docker Compose with proper configuration.
 
 ```bash
-# Run a specific script directly
-sudo ./scripts/install-docker.sh
-
-# Or source and call the function
-source ./scripts/common.sh
-source ./scripts/install-nodejs.sh
-install_nodejs --lts  # Install Node.js LTS
+sudo devops 3    # Install Docker
+sudo devops 4    # Clean Docker logs
+sudo devops 5    # Full Docker cleanup (removes everything)
 ```
 
-## Node.js with NVM
+### Node.js with NVM
 
-Node.js is installed using NVM (Node Version Manager), allowing you to:
-- Install multiple Node.js versions
-- Switch between versions easily
-- Install per-user (not system-wide)
+Node.js is installed using NVM (Node Version Manager) for flexibility:
 
 ```bash
-# After installation, use NVM commands:
+sudo devops 6    # Install Node.js (NVM only)
+sudo devops 7    # Install Node.js + PM2
+```
+
+After installation, use NVM commands:
+
+```bash
 nvm install 20          # Install Node.js 20
 nvm install --lts       # Install latest LTS
 nvm use 20              # Switch to version 20
 nvm alias default 20    # Set default version
 ```
 
-## Nginx (Docker)
+### Nginx (Docker)
 
 Nginx runs inside a Docker container with the following volume mappings:
 
@@ -152,57 +168,135 @@ Nginx runs inside a Docker container with the following volume mappings:
 | `/opt/nginx/logs/` | `/var/log/nginx/` | Log files |
 | `/opt/nginx/certs/` | `/etc/nginx/certs/` | SSL certificates |
 
-### Nginx Commands
+Common Nginx commands:
+
 ```bash
-# View logs
-docker logs nginx-server
-
-# Test configuration
-docker exec nginx-server nginx -t
-
-# Reload configuration
-docker exec nginx-server nginx -s reload
-
-# Restart container
-docker restart nginx-server
+docker logs nginx-server              # View logs
+docker exec nginx-server nginx -t     # Test config
+docker exec nginx-server nginx -s reload  # Reload config
+docker restart nginx-server           # Restart container
 ```
 
-## Recommended Initial Setup
+### Firewall (UFW)
 
-For a typical new server, run these tasks in order:
+Configures UFW firewall with secure defaults:
+
+- Allow SSH (port 22)
+- Allow HTTP (port 80)
+- Allow HTTPS (port 443)
+- Deny all other incoming traffic
+
+## Recommended Setup Sequences
+
+### New Server (Basic)
 
 ```bash
-# Essential setup
-sudo ./setup.sh 13 9 8 3 10 12 11
-
-# This will:
-# 13 - Update system
-# 9  - Install essential packages
-# 8  - Install Git
-# 3  - Install Docker
-# 10 - Setup firewall
-# 12 - Setup swap
-# 11 - Setup timezone
+sudo devops 13 9 8 10 12 11
 ```
 
-For a web server with Node.js:
+This will:
+- Update system packages (13)
+- Install essential tools (9)
+- Install Git (8)
+- Setup firewall (10)
+- Configure swap space (12)
+- Set timezone (11)
+
+### Web Server with Docker
 
 ```bash
-sudo ./setup.sh 13 9 8 3 6 14 15 10 12
+sudo devops 13 9 8 3 14 15 10 12 11
+```
 
-# Includes Docker, Node.js (NVM), Nginx (Docker), and Certbot
+Includes Docker, Nginx, and Certbot for SSL.
+
+### Node.js Application Server
+
+```bash
+sudo devops 13 9 8 3 7 10 12 11
+```
+
+Includes Node.js with PM2 for process management.
+
+### Full Stack Setup
+
+```bash
+sudo devops 13 9 8 3 7 14 15 10 12 11 1
+```
+
+Complete setup including user creation for deployments.
+
+## Project Structure
+
+```
+toolset/
+├── install.sh              # One-line installer script
+├── setup.sh                # Main CLI and interactive menu
+├── README.md               # Documentation
+├── LICENSE                 # MIT License
+└── scripts/
+    ├── common.sh           # Shared functions and utilities
+    ├── create-user.sh      # User creation with sudo & SSH
+    ├── copy-ssh-key.sh     # SSH key management
+    ├── install-docker.sh   # Docker & Docker Compose setup
+    ├── clean-docker-logs.sh    # Docker log cleanup
+    ├── clean-docker-full.sh    # Complete Docker cleanup
+    ├── install-nodejs.sh   # Node.js via NVM
+    ├── install-nodejs-pm2.sh   # Node.js + PM2 setup
+    ├── install-git.sh      # Git installation
+    ├── install-essentials.sh   # Essential packages
+    ├── setup-firewall.sh   # UFW firewall configuration
+    ├── setup-timezone.sh   # Timezone & NTP setup
+    ├── setup-swap.sh       # Swap space configuration
+    ├── system-update.sh    # System updates
+    ├── install-nginx.sh    # Nginx in Docker
+    └── install-certbot.sh  # Certbot for SSL
+```
+
+## Running Individual Scripts
+
+Each script can be run independently:
+
+```bash
+# Run a specific script directly
+sudo ~/toolset/scripts/install-docker.sh
+
+# Or source and call the function
+source ~/toolset/scripts/common.sh
+source ~/toolset/scripts/install-nodejs.sh
+install_nodejs
 ```
 
 ## Requirements
 
-- Ubuntu 20.04+ or Debian 10+
-- Root access (sudo)
-- Internet connection
-
-## License
-
-MIT License - Use freely for your projects.
+- **Operating System:** Ubuntu 20.04+ or Debian 10+
+- **Privileges:** Root access (sudo)
+- **Network:** Internet connection for package installation
+- **Tools:** `curl` or `wget` (for one-line install)
 
 ## Contributing
 
-Feel free to add new tasks or improve existing ones!
+Contributions are welcome. To contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
+
+### Adding a New Task
+
+1. Create a new script in the `scripts/` directory
+2. Follow the naming convention: `action-target.sh` (e.g., `install-redis.sh`)
+3. Include a main function named after the script (e.g., `install_redis`)
+4. Source `common.sh` for shared utilities
+5. Add the task definition to `setup.sh`
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+For issues and feature requests, please open an issue on GitHub.
+

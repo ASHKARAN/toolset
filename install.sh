@@ -10,9 +10,16 @@
 #   Or with custom install directory:
 #     curl -fsSL https://raw.githubusercontent.com/ASHKARAN/toolset/main/install.sh | INSTALL_DIR=/opt/toolset bash
 #
+#   Update existing installation:
+#     devops --update
+#     toolset --update
+#
 #===============================================================================
 
 set -e
+
+# Script mode (install or update)
+SCRIPT_MODE="${SCRIPT_MODE:-install}"
 
 # Configuration
 REPO_URL="https://github.com/ASHKARAN/toolset"
@@ -84,12 +91,22 @@ download() {
 
 # Install using git clone
 install_with_git() {
-    print_stage "Cloning repository..."
+    if [ "$SCRIPT_MODE" = "update" ]; then
+        print_stage "Updating from GitHub..."
+    else
+        print_stage "Cloning repository..."
+    fi
 
-    if [ -d "$INSTALL_DIR" ]; then
-        print_info "Directory exists, updating..."
+    if [ -d "$INSTALL_DIR/.git" ]; then
+        print_info "Git repository found, pulling latest changes..."
         cd "$INSTALL_DIR"
-        git pull --quiet
+        git fetch --all --quiet
+        git reset --hard origin/main --quiet
+        print_success "Updated to latest version"
+    elif [ -d "$INSTALL_DIR" ]; then
+        print_info "Directory exists but not a git repo, converting..."
+        rm -rf "$INSTALL_DIR"
+        git clone --quiet "$REPO_URL" "$INSTALL_DIR"
     else
         git clone --quiet "$REPO_URL" "$INSTALL_DIR"
     fi
@@ -97,7 +114,13 @@ install_with_git() {
 
 # Install by downloading individual files
 install_with_download() {
-    print_stage "Downloading toolset files..."
+    if [ "$SCRIPT_MODE" = "update" ]; then
+        print_stage "Updating toolset files from GitHub..."
+        # Remove existing scripts to ensure clean update
+        rm -rf "$INSTALL_DIR/scripts" 2>/dev/null || true
+    else
+        print_stage "Downloading toolset files..."
+    fi
 
     # Create directories
     mkdir -p "$INSTALL_DIR/scripts"
@@ -106,6 +129,7 @@ install_with_download() {
     local main_files=(
         "setup.sh"
         "README.md"
+        "LICENSE"
     )
 
     local script_files=(
@@ -147,11 +171,36 @@ set_permissions() {
     chmod +x "$INSTALL_DIR/scripts/"*.sh
 }
 
-# Create symlink (optional)
-create_symlink() {
-    if [ "$EUID" -eq 0 ] || [ -w "/usr/local/bin" ]; then
-        print_stage "Creating symlink..."
-        ln -sf "$INSTALL_DIR/setup.sh" /usr/local/bin/devops-setup 2>/dev/null || true
+# Create symlinks for global commands
+create_symlinks() {
+    print_stage "Creating symlinks..."
+
+    local symlink_dir="/usr/local/bin"
+    local commands=("devops" "toolset" "devops-setup")
+
+    # Check if we have write access
+    if [ "$EUID" -eq 0 ] || [ -w "$symlink_dir" ]; then
+        for cmd in "${commands[@]}"; do
+            ln -sf "$INSTALL_DIR/setup.sh" "$symlink_dir/$cmd" 2>/dev/null && \
+                print_success "Created symlink: $cmd" || \
+                print_error "Failed to create symlink: $cmd"
+        done
+    else
+        # Try with sudo if available
+        if command -v sudo &> /dev/null; then
+            print_info "Requesting sudo to create symlinks..."
+            for cmd in "${commands[@]}"; do
+                sudo ln -sf "$INSTALL_DIR/setup.sh" "$symlink_dir/$cmd" 2>/dev/null && \
+                    print_success "Created symlink: $cmd" || \
+                    print_error "Failed to create symlink: $cmd"
+            done
+        else
+            print_info "Cannot create symlinks without root access"
+            print_info "Run as root or manually create symlinks:"
+            for cmd in "${commands[@]}"; do
+                echo -e "  ${CYAN}sudo ln -sf $INSTALL_DIR/setup.sh $symlink_dir/$cmd${NC}"
+            done
+        fi
     fi
 }
 
@@ -159,7 +208,11 @@ create_symlink() {
 main() {
     print_banner
 
-    print_info "Install directory: $INSTALL_DIR"
+    if [ "$SCRIPT_MODE" = "update" ]; then
+        print_info "Update mode - Refetching from GitHub"
+    else
+        print_info "Install directory: $INSTALL_DIR"
+    fi
     echo
 
     check_requirements
@@ -171,10 +224,14 @@ main() {
     fi
 
     set_permissions
-    create_symlink
+    create_symlinks
 
     echo
-    print_success "Installation complete!"
+    if [ "$SCRIPT_MODE" = "update" ]; then
+        print_success "Update complete!"
+    else
+        print_success "Installation complete!"
+    fi
     echo
     print_info "To use the toolset:"
     echo -e "  ${CYAN}cd $INSTALL_DIR${NC}"
@@ -183,9 +240,15 @@ main() {
     print_info "Or run directly:"
     echo -e "  ${CYAN}sudo $INSTALL_DIR/setup.sh${NC}"
     echo
-    if [ -L "/usr/local/bin/devops-setup" ]; then
-        print_info "Global command available:"
+    if [ -L "/usr/local/bin/devops" ]; then
+        print_info "Global commands available:"
+        echo -e "  ${CYAN}sudo devops${NC}"
+        echo -e "  ${CYAN}sudo toolset${NC}"
         echo -e "  ${CYAN}sudo devops-setup${NC}"
+        echo
+        print_info "Update toolset:"
+        echo -e "  ${CYAN}devops --update${NC}"
+        echo -e "  ${CYAN}toolset --update${NC}"
         echo
     fi
     print_info "Show available tasks:"
