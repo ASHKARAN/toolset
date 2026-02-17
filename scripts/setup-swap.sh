@@ -21,7 +21,12 @@ setup_swap() {
     fi
 
     print_stage "Creating ${swap_size}G swap file"
-    fallocate -l ${swap_size}G "$swap_file"
+    # Use fallocate if available, otherwise use dd (for ext3 or older systems)
+    if command -v fallocate &> /dev/null && fallocate -l "${swap_size}G" "$swap_file" 2>/dev/null; then
+        : # fallocate succeeded
+    else
+        dd if=/dev/zero of="$swap_file" bs=1M count=$((swap_size * 1024)) status=progress
+    fi
     chmod 600 "$swap_file"
 
     print_stage "Setting up swap space"

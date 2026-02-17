@@ -23,7 +23,7 @@ clean_docker_full() {
     print_stage "Stopping all running containers"
     local containers=$(docker ps -aq)
     if [ -n "$containers" ]; then
-        docker stop $containers 2>/dev/null
+        docker stop $containers 2>/dev/null || true
         print_info "Stopped containers"
     else
         print_info "No containers running"
@@ -31,14 +31,14 @@ clean_docker_full() {
 
     print_stage "Removing all containers"
     if [ -n "$containers" ]; then
-        docker rm -f $containers 2>/dev/null
+        docker rm -f $containers 2>/dev/null || true
         print_info "Removed containers"
     fi
 
     print_stage "Removing all images"
     local images=$(docker images -q)
     if [ -n "$images" ]; then
-        docker rmi -f $images 2>/dev/null
+        docker rmi -f $images 2>/dev/null || true
         print_info "Removed images"
     else
         print_info "No images to remove"
@@ -47,7 +47,7 @@ clean_docker_full() {
     print_stage "Removing all volumes"
     local volumes=$(docker volume ls -q)
     if [ -n "$volumes" ]; then
-        docker volume rm $volumes 2>/dev/null
+        docker volume rm $volumes 2>/dev/null || true
         print_info "Removed volumes"
     else
         print_info "No volumes to remove"
@@ -56,7 +56,7 @@ clean_docker_full() {
     print_stage "Removing custom networks"
     local networks=$(docker network ls -q --filter type=custom)
     if [ -n "$networks" ]; then
-        docker network rm $networks 2>/dev/null
+        docker network rm $networks 2>/dev/null || true
         print_info "Removed networks"
     else
         print_info "No custom networks to remove"

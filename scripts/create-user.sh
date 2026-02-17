@@ -45,11 +45,11 @@ create_user() {
     usermod -aG sudo "$new_username"
 
     print_stage "Setting up SSH directory"
-    mkdir -p /home/$new_username/.ssh
-    touch /home/$new_username/.ssh/authorized_keys
-    chmod 700 /home/$new_username/.ssh
-    chmod 600 /home/$new_username/.ssh/authorized_keys
-    chown -R $new_username:$new_username /home/$new_username/.ssh
+    mkdir -p "/home/$new_username/.ssh"
+    touch "/home/$new_username/.ssh/authorized_keys"
+    chmod 700 "/home/$new_username/.ssh"
+    chmod 600 "/home/$new_username/.ssh/authorized_keys"
+    chown -R "$new_username:$new_username" "/home/$new_username/.ssh"
 
     print_success "User '$new_username' created successfully"
     print_info "SSH authorized_keys file: /home/$new_username/.ssh/authorized_keys"

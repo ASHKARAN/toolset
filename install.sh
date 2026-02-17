@@ -101,7 +101,7 @@ install_with_git() {
         print_info "Git repository found, pulling latest changes..."
         cd "$INSTALL_DIR"
         git fetch --all --quiet
-        git reset --hard origin/main --quiet
+        git reset --quiet --hard origin/main
         print_success "Updated to latest version"
     elif [ -d "$INSTALL_DIR" ]; then
         print_info "Directory exists but not a git repo, converting..."
@@ -128,6 +128,7 @@ install_with_download() {
     # List of files to download
     local main_files=(
         "setup.sh"
+        "install.sh"
         "README.md"
         "LICENSE"
     )

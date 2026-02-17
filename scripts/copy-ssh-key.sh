@@ -35,7 +35,13 @@ copy_ssh_key() {
     fi
 
     # Ensure .ssh directory exists
-    local ssh_dir="/home/$target_user/.ssh"
+    local user_home
+    if [ "$target_user" = "root" ]; then
+        user_home="/root"
+    else
+        user_home="/home/$target_user"
+    fi
+    local ssh_dir="$user_home/.ssh"
     local auth_keys="$ssh_dir/authorized_keys"
 
     print_stage "Setting up SSH directory"
@@ -51,7 +57,7 @@ copy_ssh_key() {
     print_stage "Adding SSH key"
     echo "$ssh_key" >> "$auth_keys"
     chmod 600 "$auth_keys"
-    chown -R $target_user:$target_user "$ssh_dir"
+    chown -R "$target_user:$target_user" "$ssh_dir"
 
     print_success "SSH key added for user '$target_user'"
 }
